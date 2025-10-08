@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      # ✅ Step 1: Checkout repository
+      # ✅ Step 1: Checkout project
       - name: Checkout repository
         uses: actions/checkout@v4
 
@@ -19,55 +19,65 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: "3.10"
 
-      # ✅ Step 3: Install system dependencies
-      - name: Install build dependencies
+      # ✅ Step 3: Install system and build dependencies
+      - name: Install system build dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip git zip unzip openjdk-17-jdk wget
+          sudo apt install -y \
+            python3-pip \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            wget \
+            automake \
+            autoconf \
+            libtool \
+            pkg-config \
+            build-essential
+          
           pip install --upgrade pip
           pip install buildozer cython virtualenv
 
-      # ✅ Step 4: Install Android SDK and accept licenses
+      # ✅ Step 4: Install Android SDK Command Line Tools
       - name: Install Android SDK and accept licenses
         run: |
-          export ANDROID_SDK_ROOT="$HOME/android-sdk"
-          export ANDROID_HOME="$ANDROID_SDK_ROOT"
-          export JAVA_HOME="/usr/lib/jvm/java-17-openjdk-amd64"
-          export PATH="$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH"
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$ANDROID_SDK_ROOT/platform-tools:$PATH
 
-          mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools"
-          cd "$ANDROID_SDK_ROOT/cmdline-tools"
+          mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
+          cd $ANDROID_SDK_ROOT/cmdline-tools
+          
           wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdtools.zip
           unzip -q cmdtools.zip
+
           mkdir -p latest
           mv cmdline-tools/* latest/
 
-          # Accept all licenses cleanly (avoids broken pipe noise)
-          yes | sdkmanager --licenses 2>/dev/null || true
-
-          # Use STABLE build-tools version (36.1.0 is problematic!)
+          yes | sdkmanager --licenses || true
           sdkmanager "platform-tools" "platforms;android-33" "build-tools;34.0.0"
 
-          # Create symlink for sdkmanager in old location for Buildozer compatibility
-          mkdir -p "$ANDROID_SDK_ROOT/tools/bin"
-          ln -sf "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "$ANDROID_SDK_ROOT/tools/bin/sdkmanager"
-          ln -sf "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager" "$ANDROID_SDK_ROOT/tools/bin/avdmanager"
+          # Fix for Buildozer expecting sdkmanager in tools/bin/
+          mkdir -p $ANDROID_SDK_ROOT/tools/bin
+          ln -sf $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager $ANDROID_SDK_ROOT/tools/bin/sdkmanager
+          ln -sf $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/avdmanager $ANDROID_SDK_ROOT/tools/bin/avdmanager
 
-      # ✅ Step 5: Link SDK to Buildozer's expected path
-      - name: Configure Buildozer to use pre-installed SDK
+      # ✅ Step 5: Link SDK path to Buildozer's expected folder
+      - name: Configure Buildozer to use Android SDK
         run: |
-          mkdir -p "$HOME/.buildozer/android/platform"
-          ln -sf "$HOME/android-sdk" "$HOME/.buildozer/android/platform/android-sdk"
+          mkdir -p $HOME/.buildozer/android/platform
+          ln -sf $HOME/android-sdk $HOME/.buildozer/android/platform/android-sdk
 
-      # ✅ Step 6: Build APK with Buildozer
-      - name: Build APK
+      # ✅ Step 6: Build the APK using Buildozer
+      - name: Build with Buildozer
         run: |
           buildozer android debug
 
-      # ✅ Step 7: Upload the generated APK
-      - name: Upload APK
+      # ✅ Step 7: Upload generated APK
+      - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
           name: app-apk
