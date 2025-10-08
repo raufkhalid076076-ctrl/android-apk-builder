@@ -29,21 +29,23 @@ jobs:
           pip install --upgrade pip
           pip install buildozer cython virtualenv
 
-      # ✅ Step 4: Install Android SDK manually & accept licenses
+      # ✅ Step 4: Install Android SDK manually (fixed path)
       - name: Install Android SDK manually
         run: |
           mkdir -p $HOME/android-sdk/cmdline-tools
           cd $HOME/android-sdk/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip commandlinetools-linux-11076708_latest.zip -d latest
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdtools.zip
+          unzip cmdtools.zip
+          mkdir -p $HOME/android-sdk/cmdline-tools/latest
+          mv cmdline-tools/* $HOME/android-sdk/cmdline-tools/latest/
           yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses || true
           yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-33" "build-tools;36.0.0"
 
-      # ✅ Step 5: Tell Buildozer to use the installed SDK
-      - name: Set environment variables for Buildozer
+      # ✅ Step 5: Set environment for Buildozer
+      - name: Set environment variables
         run: |
-          echo "export ANDROIDSDK=$HOME/android-sdk" >> $GITHUB_ENV
-          echo "export PATH=$HOME/android-sdk/platform-tools:$HOME/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
+          echo "ANDROIDSDK=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "PATH=$HOME/android-sdk/platform-tools:$HOME/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
 
       # ✅ Step 6: Build APK
       - name: Build APK
