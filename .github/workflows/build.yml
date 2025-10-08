@@ -44,20 +44,17 @@ jobs:
           mkdir -p latest
           mv cmdline-tools/* latest/
 
-          # Accept all licenses (robust method)
-          (while true; do echo y; done) | sdkmanager --licenses > /dev/null 2>&1 || true
+          # Accept all licenses cleanly (avoids broken pipe noise)
+          yes | sdkmanager --licenses 2>/dev/null || true
 
-          # Install required SDK components
-          sdkmanager "platform-tools" "platforms;android-33" "build-tools;36.1.0"
-        env:
-          ANDROID_SDK_ROOT: ${{ env.HOME }}/android-sdk
-          JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+          # Use STABLE build-tools version (36.1.0 is problematic!)
+          sdkmanager "platform-tools" "platforms;android-33" "build-tools;34.0.0"
 
       # ✅ Step 5: Link SDK to Buildozer's expected path
       - name: Configure Buildozer to use pre-installed SDK
         run: |
-          mkdir -p $HOME/.buildozer/android/platform
-          ln -sf $HOME/android-sdk $HOME/.buildozer/android/platform/android-sdk
+          mkdir -p "$HOME/.buildozer/android/platform"
+          ln -sf "$HOME/android-sdk" "$HOME/.buildozer/android/platform/android-sdk"
 
       # ✅ Step 6: Build APK with Buildozer
       - name: Build APK
