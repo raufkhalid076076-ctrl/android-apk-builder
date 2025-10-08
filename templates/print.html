@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Fee Slip</title>
+	<link rel="stylesheet" href="/static/styles.css" />
+	<style>
+		/***** Two-column A4 layout (compact, fit both, visible borders) *****/
+		.page{ width:210mm; margin: 0 auto; }
+		.grid{ display:grid; grid-template-columns: 1fr 1fr; gap: 3mm; padding: 6mm 6mm; box-sizing: border-box; }
+		.copy{ border:1px solid #000; background:#fff; padding:3mm; box-sizing: border-box; display:flex; flex-direction:column; break-inside: avoid; }
+		.copy.small{ padding:2.5mm; }
+		/* Fallback outline to ensure border prints */
+		@media print{ .copy{ outline: 1px solid #000; outline-offset: 0; } }
+		.header { display:flex; justify-content:space-between; align-items:center; margin-bottom:2.5mm; }
+		.header .school{ text-align:left; }
+		.header h2{ margin:0; font-size:15px; }
+		.copy.small .header h2{ font-size:14px; }
+		.header small{ color:#555; font-size:10px; }
+		.meta { display:grid; grid-template-columns: repeat(2, 1fr); gap:2mm; margin:2mm 0 3mm; }
+		.meta .item{ display:flex; gap:2mm; align-items:center; }
+		.meta label{ width:24mm; color:#555; font-size:10px; }
+		.meta input{ flex:1; border:1px solid #ccc; padding:1mm; border-radius:1.5mm; font-size:10px; min-width:0; }
+		.copy.small .meta label{ font-size:9.5px; width:23mm; }
+		.copy.small .meta input{ font-size:9.5px; padding:0.8mm; }
+		.table { width:100%; border-collapse:collapse; font-size:10px; table-layout: fixed; }
+		.table th, .table td { border:1px solid #000; padding:1.6mm; vertical-align: top; word-wrap: break-word; overflow-wrap: anywhere; }
+		.copy.small .table{ font-size:9.5px; }
+		.copy.small .table th, .copy.small .table td{ padding:1.4mm; }
+		.table th { background:#f3f4f6; }
+		.copy-badge{ font-size:10px; color:#374151; border:1px solid #cbd5e1; padding:1mm 3mm; border-radius:2mm; }
+		.signs{ display:flex; justify-content:space-between; margin-top:4mm; font-size:10px; }
+		.copy.small .signs{ font-size:9.5px; margin-top:3.5mm; }
+		/* Ensure inputs don't overflow when printing */
+		.fee-table input{ width:100%; box-sizing:border-box; font-size:10px; padding:1mm; }
+		.copy.small .fee-table input{ font-size:9.5px; padding:0.8mm; }
+		@media print{
+			@page { size: A4 portrait; margin: 12mm 12mm; }
+			.no-print { display: none !important; }
+			.page{ width:auto; }
+			.grid{ padding: 6mm 6mm; gap: 3mm; }
+			body{ background:#fff; }
+			/* Make inputs look like plain text to save space */
+			.fee-table input{ border:none; padding:0; background:transparent; }
+		}
+	</style>
+</head>
+<body>
+	<div class="page">
+		<div class="grid">
+			<div class="copy small" id="copy-school">
+				<div class="header">
+					<div class="school">
+						<h2>THE MASTER SCHOOL SYSTEM</h2>
+						<small>Village Noor Pur, Lahore Cantt. | Contact: 0307-4605762</small>
+					</div>
+					<div style="display:flex; gap:6px; align-items:center;">
+						<span class="copy-badge">School Copy</span>
+						<div class="no-print"><button onclick="window.print()">Print</button></div>
+					</div>
+				</div>
+				<div class="meta">
+					<div class="item"><label>Date</label><input class="meta-date" type="date"></div>
+					<div class="item"><label>Class</label><input class="meta-class" type="text" readonly></div>
+					<div class="item"><label>School ID</label><input class="meta-schoolid" type="text"></div>
+					<div class="item"><label>GR No</label><input class="meta-gr" type="text"></div>
+					<div class="item" style="grid-column: 1 / span 2;"><label>Name</label><input class="meta-name" type="text" readonly></div>
+					<div class="item" style="grid-column: 1 / span 2;"><label>Father Name</label><input class="meta-father" type="text" readonly></div>
+				</div>
+				<table class="table fee-table">
+					<thead>
+						<tr><th>Descriptions</th><th>Received Amount</th><th>Balance</th></tr>
+					</thead>
+					<tbody>
+						<tr><td>Admission Fee</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Examination Fee</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Monthly Fee (<span class="month-label"></span>)</td><td><input class="monthly-received" type="number" min="0" value="0"></td><td><input class="monthly-balance" type="number" min="0" value="0"></td></tr>
+						<tr><td>Book Sale / Rent</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Copy Sale</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Uniform Sale</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Others</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+					</tbody>
+					<tfoot>
+						<tr><td>Total Amount</td><td class="total-received">0</td><td class="total-balance">0</td></tr>
+					</tfoot>
+				</table>
+				<div class="signs"><div>_____________________<br>Admin Assistant</div><div>_____________________<br>Student / Parents</div></div>
+			</div>
+
+			<div class="copy" id="copy-student">
+				<div class="header">
+					<div class="school">
+						<h2>THE MASTER SCHOOL SYSTEM</h2>
+						<small>Village Noor Pur, Lahore Cantt. | Contact: 0307-4605762</small>
+					</div>
+					<div><span class="copy-badge">Student Copy</span></div>
+				</div>
+				<div class="meta">
+					<div class="item"><label>Date</label><input class="meta-date" type="date"></div>
+					<div class="item"><label>Class</label><input class="meta-class" type="text" readonly></div>
+					<div class="item"><label>School ID</label><input class="meta-schoolid" type="text"></div>
+					<div class="item"><label>GR No</label><input class="meta-gr" type="text"></div>
+					<div class="item" style="grid-column: 1 / span 2;"><label>Name</label><input class="meta-name" type="text" readonly></div>
+					<div class="item" style="grid-column: 1 / span 2;"><label>Father Name</label><input class="meta-father" type="text" readonly></div>
+				</div>
+				<table class="table fee-table">
+					<thead>
+						<tr><th>Descriptions</th><th>Received Amount</th><th>Balance</th></tr>
+					</thead>
+					<tbody>
+						<tr><td>Admission Fee</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Examination Fee</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Monthly Fee (<span class="month-label"></span>)</td><td><input class="monthly-received" type="number" min="0" value="0"></td><td><input class="monthly-balance" type="number" min="0" value="0"></td></tr>
+						<tr><td>Book Sale / Rent</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Copy Sale</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Uniform Sale</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+						<tr><td>Others</td><td><input type="number" min="0" value="0"></td><td><input type="number" min="0" value="0"></td></tr>
+					</tbody>
+					<tfoot>
+						<tr><td>Total Amount</td><td class="total-received">0</td><td class="total-balance">0</td></tr>
+					</tfoot>
+				</table>
+				<div class="signs"><div>_____________________<br>Admin Assistant</div><div>_____________________<br>Student / Parents</div></div>
+			</div>
+		</div>
+	</div>
+
+	<script>
+	(function(){
+		const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+		const sid = window.location.pathname.split('/').pop();
+		const qs = new URLSearchParams(window.location.search);
+		const monthIndex = qs.has('month_index') ? Number(qs.get('month_index')) : null;
+
+		function updateTotals(scope){
+			let rec = 0, bal = 0;
+			scope.querySelectorAll('.fee-table tbody tr').forEach(tr=>{
+				const inputs = tr.querySelectorAll('input');
+				const r = Number(inputs[0].value||0);
+				const b = Number(inputs[1].value||0);
+				rec += r; bal += b;
+			});
+			scope.querySelector('.total-received').textContent = rec;
+			scope.querySelector('.total-balance').textContent = bal;
+		}
+
+		function fillCopy(scope, student, payment){
+			scope.querySelectorAll('.meta-date').forEach(i=>{ i.valueAsDate = new Date(); });
+			scope.querySelectorAll('.meta-class').forEach(i=>{ i.value = student.class_name; });
+			scope.querySelectorAll('.meta-name').forEach(i=>{ i.value = student.student_name; });
+			scope.querySelectorAll('.meta-father').forEach(i=>{ i.value = student.father_name || ''; });
+			scope.querySelectorAll('.month-label').forEach(e=>{ e.textContent = monthIndex!=null? months[monthIndex] : ''; });
+			if(monthIndex!=null && payment){
+				scope.querySelectorAll('.monthly-received').forEach(i=>{ i.value = payment.amount || 0; });
+				scope.querySelectorAll('.monthly-balance').forEach(i=>{ i.value = payment.carry_forward_due || 0; });
+			}
+			updateTotals(scope);
+			scope.querySelector('.fee-table').addEventListener('input', ()=> updateTotals(scope));
+		}
+
+		Promise.all([
+			fetch(`/api/students`).then(r=>r.json()),
+		]).then(([students])=>{
+			const student = students.find(x=>String(x.id)===String(sid));
+			if(!student){ return; }
+			return fetch(`/api/students/${student.id}/payments`).then(r=>r.json()).then(pay=>{
+				const payment = monthIndex!=null ? pay[monthIndex] : null;
+				fillCopy(document.getElementById('copy-school'), student, payment);
+				fillCopy(document.getElementById('copy-student'), student, payment);
+			});
+		});
+	})();
+	</script>
+</body>
+</html>
+
+

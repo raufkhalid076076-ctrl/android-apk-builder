@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>School Fee Manager</title>
+	<link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+	<header>
+		<h1>School Fee Manager</h1>
+	</header>
+
+	<main class="layout">
+		<aside class="card sidebar">
+			<h3>Classes</h3>
+			<ul id="class-list" class="class-list"></ul>
+		</aside>
+		<div class="content">
+			<section class="card">
+				<h2>Add / Edit Student</h2>
+				<form id="student-form">
+					<input type="hidden" id="student-id" />
+					<div class="row">
+						<label>Class</label>
+						<input type="text" id="class_name" required />
+					</div>
+					<div class="row">
+						<label>Student Name</label>
+						<input type="text" id="student_name" required />
+					</div>
+					<div class="row">
+						<label>Father Name</label>
+						<input type="text" id="father_name" required />
+					</div>
+					<div class="row">
+						<label>Parent WhatsApp</label>
+						<input type="text" id="parent_phone" placeholder="e.g. +923001234567" />
+					</div>
+					<div class="row">
+						<label>Monthly Fee</label>
+						<input type="number" id="monthly_fee" min="0" required />
+					</div>
+					<div class="actions">
+						<button type="submit">Save</button>
+						<button type="button" id="reset">Reset</button>
+					</div>
+				</form>
+			</section>
+
+			<section class="card">
+				<div class="toolbar">
+					<h2>Students</h2>
+					<div style="display:flex; gap:8px; align-items:center;">
+						<label for="print-month">Print Month</label>
+						<select id="print-month"></select>
+						<button id="refresh">Refresh</button>
+					</div>
+				</div>
+				<table id="students-table">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>Class</th>
+							<th>Name</th>
+							<th>Father</th>
+							<th>Phone</th>
+							<th>Monthly Fee</th>
+							<th>Actions</th>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</section>
+		</div>
+		</main>
+
+	<script src="/static/app.js"></script>
+</body>
+</html>
+
+

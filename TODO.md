@@ -1,0 +1,13 @@
+- Install Kivy and KivyMD ✓
+- Create main.py with Kivy app structure ✓
+- Create KV file for UI (main.kv) ✓ (inline)
+- Implement database models using sqlite3 ✓
+- Implement main screen with class list and student table ✓
+- Implement add/edit student form ✓
+- Implement payments dialog ✓
+- Implement print slip (skipped for now)
+- Implement sync mechanism (server/client for local network) ✓
+- Install buildozer ✓
+- Create buildozer.spec ✓
+- Build APK (set up GitHub Actions for online build)
+- Test on phones
