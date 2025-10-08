@@ -21,37 +21,36 @@ jobs:
         with:
           python-version: '3.10'
 
-      # ✅ Step 3: Install system dependencies
-      - name: Install system dependencies
+      # ✅ Step 3: Install dependencies
+      - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip git zip unzip openjdk-17-jdk
+          sudo apt install -y python3-pip git zip unzip openjdk-17-jdk wget
           pip install --upgrade pip
-
-      # ✅ Step 4: Install Buildozer and dependencies
-      - name: Install Buildozer
-        run: |
           pip install buildozer cython virtualenv
 
-      # ✅ Step 5: Accept Android SDK licenses (important fix)
-      - name: Accept Android SDK licenses
+      # ✅ Step 4: Install Android SDK manually & accept licenses
+      - name: Install Android SDK manually
         run: |
-          mkdir -p ~/.android/licenses
-          echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e" > ~/.android/licenses/android-sdk-license
-          echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.android/licenses/android-sdk-preview-license
+          mkdir -p $HOME/android-sdk/cmdline-tools
+          cd $HOME/android-sdk/cmdline-tools
+          wget https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          unzip commandlinetools-linux-11076708_latest.zip -d latest
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk --licenses || true
+          yes | $HOME/android-sdk/cmdline-tools/latest/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools" "platforms;android-33" "build-tools;36.0.0"
 
-      # ✅ Step 6: Optional - Debug SDK (shows installed packages)
-      - name: Debug Android SDK
+      # ✅ Step 5: Tell Buildozer to use the installed SDK
+      - name: Set environment variables for Buildozer
         run: |
-          yes | sdkmanager --licenses || true
-          sdkmanager --list || true
+          echo "export ANDROIDSDK=$HOME/android-sdk" >> $GITHUB_ENV
+          echo "export PATH=$HOME/android-sdk/platform-tools:$HOME/android-sdk/cmdline-tools/latest/bin:$PATH" >> $GITHUB_ENV
 
-      # ✅ Step 7: Build APK
+      # ✅ Step 6: Build APK
       - name: Build APK
         run: |
           buildozer android debug
 
-      # ✅ Step 8: Upload APK as GitHub Artifact
+      # ✅ Step 7: Upload APK
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
