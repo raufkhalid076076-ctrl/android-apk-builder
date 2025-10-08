@@ -24,4 +24,14 @@ jobs:
           sudo apt update
           sudo apt install -y python3-pip git zip unzip openjdk-17-jdk
           python -m pip install --upgrade pip
-          pip in
+          pip install buildozer cython virtualenv
+
+      - name: Build APK
+        run: |
+          buildozer android debug
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-apk
+          path: bin/*.apk
