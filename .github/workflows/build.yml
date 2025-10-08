@@ -11,25 +11,47 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # ✅ Step 1: Checkout repository
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      # ✅ Step 2: Set up Python
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
+      # ✅ Step 3: Install system dependencies
+      - name: Install system dependencies
         run: |
           sudo apt update
           sudo apt install -y python3-pip git zip unzip openjdk-17-jdk
-          python -m pip install --upgrade pip
+          pip install --upgrade pip
+
+      # ✅ Step 4: Install Buildozer and dependencies
+      - name: Install Buildozer
+        run: |
           pip install buildozer cython virtualenv
 
+      # ✅ Step 5: Accept Android SDK licenses (important fix)
+      - name: Accept Android SDK licenses
+        run: |
+          mkdir -p ~/.android/licenses
+          echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55\nd56f5187479451eabf01fb78af6dfcb131a6481e" > ~/.android/licenses/android-sdk-license
+          echo -e "\n24333f8a63b6825ea9c5514f83c2829b004d1fee" > ~/.android/licenses/android-sdk-preview-license
+
+      # ✅ Step 6: Optional - Debug SDK (shows installed packages)
+      - name: Debug Android SDK
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager --list || true
+
+      # ✅ Step 7: Build APK
       - name: Build APK
         run: |
           buildozer android debug
 
+      # ✅ Step 8: Upload APK as GitHub Artifact
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
